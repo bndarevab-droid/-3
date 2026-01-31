@@ -6,97 +6,50 @@
     <title>Петиция MoneyMens</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: white;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: white; font-family: sans-serif; overflow: hidden; }
+        .container { text-align: center; }
+        .header-text { color: black; font-weight: bold; margin-bottom: 20px; font-size: 1.2rem; }
+        .btn-yellow { background-color: #ffeb3b; border: none; padding: 15px 30px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* Кнопка "Список" для тебя */
+        #admin-btn { 
+            display: none; position: fixed; top: 20px; right: 20px; 
+            background: #000; color: #fff; border: none; padding: 10px 15px; 
+            border-radius: 5px; cursor: pointer; z-index: 100; font-weight: bold;
         }
 
-        .container {
-            text-align: center;
-            transition: opacity 0.5s ease;
+        /* Окно со списком */
+        #list-modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; border: 2px solid black; padding: 20px; width: 85%; max-width: 400px; z-index: 101;
+            max-height: 70vh; overflow-y: auto; box-shadow: 0 0 30px rgba(0,0,0,0.3); border-radius: 10px;
         }
 
-        .header-text {
-            color: black;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
+        /* Анимация карандаша */
+        .fa-pencil { margin-left: 10px; animation: writing 1.5s infinite; }
+        @keyframes writing { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(25deg) translate(3px, -3px); } }
 
-        .btn-yellow {
-            background-color: #ffeb3b;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 50px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-
-        .btn-yellow:hover {
-            transform: scale(1.05);
-        }
-
-        /* Анимация печатающего карандаша */
-        .fa-pencil {
-            margin-left: 10px;
-            animation: writing 1.5s infinite;
-        }
-
-        @keyframes writing {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(2px, -2px) rotate(10deg); }
-            50% { transform: translate(0, 0) rotate(0deg); }
-            75% { transform: translate(-2px, 2px) rotate(-10deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
-        /* Скрытые элементы */
-        #input-section, #success-message {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-
-        .input-field {
-            margin-top: 20px;
-            padding: 10px;
-            width: 250px;
-            border: 2px solid #eee;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        .btn-apply {
-            display: block;
-            margin: 15px auto;
-            padding: 10px 25px;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .success-text {
-            font-size: 1.5rem;
-            color: #2ecc71;
-            font-weight: bold;
-        }
+        /* Плавное появление элементов */
+        #input-section, #success-message { display: none; opacity: 0; transition: opacity 0.6s ease; }
+        .input-field { margin-top: 20px; padding: 12px; width: 250px; border: 2px solid #ddd; border-radius: 8px; outline: none; font-size: 1rem; }
+        .btn-apply { display: block; margin: 15px auto; padding: 10px 30px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .success-text { font-size: 1.6rem; color: #2ecc71; font-weight: bold; }
+        
+        ul { list-style: none; padding: 0; }
+        li { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-container">
+    <button id="admin-btn" onclick="toggleList()">Список</button>
+
+    <div id="list-modal">
+        <h3 style="margin-top:0;">Все подписавшие:</h3>
+        <ul id="user-list">Загрузка...</ul>
+        <button onclick="toggleList()" style="width:100%; padding:10px; background:#eee; border:1px solid #ccc; border-radius:5px; cursor:pointer;">Закрыть</button>
+    </div>
+
+    <div class="container">
         <div id="action-section">
             <div class="header-text">Участник клана MoneyMens</div>
             <button class="btn-yellow" id="petition-btn">
@@ -105,7 +58,7 @@
         </div>
 
         <div id="input-section">
-            <input type="text" class="input-field" placeholder="@username" id="username">
+            <input type="text" class="input-field" placeholder="@username" id="username-input">
             <button class="btn-apply" id="apply-btn">Применить</button>
         </div>
 
@@ -115,39 +68,87 @@
     </div>
 
     <script>
-        const petitionBtn = document.getElementById('petition-btn');
-        const actionSection = document.getElementById('action-section');
-        const inputSection = document.getElementById('input-section');
-        const applyBtn = document.getElementById('apply-btn');
-        const successMessage = document.getElementById('success-message');
+        // Ссылка на твою базу данных
+        const API_URL = "https://sheetdb.io/api/v1/gwmjyjvdd4rz5";
+        const adminNick = "kamiplayrbxYt";
 
-        // Проверка: подписывал ли уже (localStorage)
+        // Проверка при заходе: если уже подписал, сразу показываем "Готово"
         window.onload = () => {
+            const savedNick = localStorage.getItem('my_nick');
             if (localStorage.getItem('signed') === 'true') {
                 showSuccess();
+                if (savedNick === adminNick) {
+                    document.getElementById('admin-btn').style.display = 'block';
+                }
             }
         };
 
         // Клик по желтой кнопке
-        petitionBtn.onclick = () => {
-            actionSection.style.display = 'none';
-            inputSection.style.display = 'block';
-            setTimeout(() => inputSection.style.opacity = '1', 10);
+        document.getElementById('petition-btn').onclick = () => {
+            document.getElementById('action-section').style.display = 'none';
+            const inputSect = document.getElementById('input-section');
+            inputSect.style.display = 'block';
+            setTimeout(() => inputSect.style.opacity = '1', 10);
         };
 
-        // Клик по "Применить"
-        applyBtn.onclick = () => {
-            inputSection.style.display = 'none';
+        // Клик по кнопке "Применить"
+        document.getElementById('apply-btn').onclick = async () => {
+            const val = document.getElementById('username-input').value.trim();
+            if(!val) return alert("Введи ник!");
+
+            // Отправляем ник в Google Таблицу
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ "data": [{ "username": val }] })
+                });
+            } catch (e) { console.error("Ошибка сети"); }
+
+            // Сохраняем состояние в браузере, чтобы не вернулся назад
             localStorage.setItem('signed', 'true');
+            localStorage.setItem('my_nick', val);
+
+            // Если это ты - показываем кнопку списка
+            if(val === adminNick) {
+                document.getElementById('admin-btn').style.display = 'block';
+            }
+
             showSuccess();
         };
 
         function showSuccess() {
-            actionSection.style.display = 'none';
-            inputSection.style.display = 'none';
-            successMessage.style.display = 'block';
-            setTimeout(() => successMessage.style.opacity = '1', 10);
+            document.getElementById('action-section').style.display = 'none';
+            document.getElementById('input-section').style.display = 'none';
+            const succ = document.getElementById('success-message');
+            succ.style.display = 'block';
+            setTimeout(() => succ.style.opacity = '1', 10);
+        }
+
+        // Функция для показа списка (только для тебя)
+        async function toggleList() {
+            const modal = document.getElementById('list-modal');
+            const list = document.getElementById('user-list');
+            
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+                return;
+            }
+
+            modal.style.display = 'block';
+            list.innerHTML = "<li>Загрузка...</li>";
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                list.innerHTML = "";
+                data.forEach(user => {
+                    let li = document.createElement('li');
+                    li.innerText = user.username;
+                    list.appendChild(li);
+                });
+            } catch (e) { list.innerHTML = "<li>Ошибка загрузки данных</li>"; }
         }
     </script>
 </body>
-  </html>
+</html>
