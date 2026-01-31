@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Петиция MoneyMens</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .header-text {
+            color: black;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .btn-yellow {
+            background-color: #ffeb3b;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .btn-yellow:hover {
+            transform: scale(1.05);
+        }
+
+        /* Анимация печатающего карандаша */
+        .fa-pencil {
+            margin-left: 10px;
+            animation: writing 1.5s infinite;
+        }
+
+        @keyframes writing {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(2px, -2px) rotate(10deg); }
+            50% { transform: translate(0, 0) rotate(0deg); }
+            75% { transform: translate(-2px, 2px) rotate(-10deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Скрытые элементы */
+        #input-section, #success-message {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .input-field {
+            margin-top: 20px;
+            padding: 10px;
+            width: 250px;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .btn-apply {
+            display: block;
+            margin: 15px auto;
+            padding: 10px 25px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .success-text {
+            font-size: 1.5rem;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-container">
+        <div id="action-section">
+            <div class="header-text">Участник клана MoneyMens</div>
+            <button class="btn-yellow" id="petition-btn">
+                Подписать петицию <i class="fa-solid fa-pencil"></i>
+            </button>
+        </div>
+
+        <div id="input-section">
+            <input type="text" class="input-field" placeholder="@username" id="username">
+            <button class="btn-apply" id="apply-btn">Применить</button>
+        </div>
+
+        <div id="success-message">
+            <div class="success-text">Петиция подписана!</div>
+        </div>
+    </div>
+
+    <script>
+        const petitionBtn = document.getElementById('petition-btn');
+        const actionSection = document.getElementById('action-section');
+        const inputSection = document.getElementById('input-section');
+        const applyBtn = document.getElementById('apply-btn');
+        const successMessage = document.getElementById('success-message');
+
+        // Проверка: подписывал ли уже (localStorage)
+        window.onload = () => {
+            if (localStorage.getItem('signed') === 'true') {
+                showSuccess();
+            }
+        };
+
+        // Клик по желтой кнопке
+        petitionBtn.onclick = () => {
+            actionSection.style.display = 'none';
+            inputSection.style.display = 'block';
+            setTimeout(() => inputSection.style.opacity = '1', 10);
+        };
+
+        // Клик по "Применить"
+        applyBtn.onclick = () => {
+            inputSection.style.display = 'none';
+            localStorage.setItem('signed', 'true');
+            showSuccess();
+        };
+
+        function showSuccess() {
+            actionSection.style.display = 'none';
+            inputSection.style.display = 'none';
+            successMessage.style.display = 'block';
+            setTimeout(() => successMessage.style.opacity = '1', 10);
+        }
+    </script>
+</body>
+  </html>
